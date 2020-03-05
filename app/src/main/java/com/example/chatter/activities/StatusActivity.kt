@@ -1,33 +1,16 @@
-package com.example.chatter.activities.activities.activities
+package com.example.chatter.activities
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import com.example.chatter.R
-import com.google.common.io.ByteStreams.toByteArray
-import com.google.common.io.Files.toByteArray
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.StorageReference
-import com.google.protobuf.Internal.toByteArray
-import com.theartofdev.edmodo.cropper.CropImage
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.format
-import id.zelory.compressor.constraint.quality
-import id.zelory.compressor.constraint.resolution
-import io.grpc.internal.IoUtils.toByteArray
-import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.activity_status.*
-import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
-import java.io.File
 
 class StatusActivity : AppCompatActivity() {
     private lateinit var mDatabase: DatabaseReference

@@ -1,26 +1,26 @@
-package com.example.chatter.activities.activities.activities
+package com.example.chatter.activities
 
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
+import android.provider.MediaStore
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.example.chatter.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.format
-import id.zelory.compressor.constraint.quality
-import id.zelory.compressor.constraint.resolution
 import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.io.File
+
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var mAuth: FirebaseAuth
@@ -53,6 +53,10 @@ class SettingsActivity : AppCompatActivity() {
                 //Устанавливаем текст в поля
                 settingsDisplayName.text = displayName.toString()
                 settingsStatustextId.text = userStatus.toString()
+
+                if (!image!!.equals("default")) {
+                    Picasso.get().load(image.toString()).into(settingsProfileImg)
+                }
             }
         })
         //Запускаем новый интент и передаем в него статус
@@ -63,7 +67,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         settingsChangeImageButtonId.setOnClickListener {
-            var galleryIntent = Intent()
+            val galleryIntent = Intent()
             galleryIntent.type = "image/*"
             galleryIntent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(galleryIntent, "SELECT_IMAGE"), GALLERY_ID)
@@ -83,20 +87,60 @@ class SettingsActivity : AppCompatActivity() {
             if (resultCode === Activity.RESULT_OK) {
                 //Оригинальный файл
                 val resultUri = result.uri
-
                 var userId = mCurrentUser!!.uid
                 var thumbFile = File(resultUri.path)
 
-//                lifecycleScope.launch {
-//                    var compressedImageFile  = Compressor.compress(applicationContext, thumbFile) {
-//                        resolution(200, 200)
-//                        quality(80)
-//                        format(Bitmap.CompressFormat.WEBP)
+
+
+//                val bitmap =
+//                    MediaStore.Images.Media.getBitmap(this.contentResolver, resultUri)
+//                var byteArray = ByteArrayOutputStream()
+//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArray)
+//                var thumbByteArray: ByteArray
+//                thumbByteArray = byteArray.toByteArray()
+
+                var filePath = mStorageRef.child("chat_profile_images").child("$userId.jpg")
+                //Путь для маленьких картинок
+//                var thumbFilePath = mStorageRef!!.child("chat_profile_images").child("thumbs").child(userId + ".jpg")
+
+//                var uploadTask = thumbFilePath.putBytes(thumbByteArray)
+
+
+                filePath.putFile(resultUri).addOnSuccessListener {
+                    filePath.downloadUrl
+                        .addOnSuccessListener { uri ->
+                            var updateObj = HashMap<String, Any>()
+                                updateObj["image"] = uri.toString()
+//                                updateObj["thumb_image"] = thumbUrl
+
+                                mDatabase.updateChildren(updateObj)
+                        }
+                }
+
+//                filePath.putFile(resultUri).addOnCompleteListener{
+//                    task ->
+//                    if (task.isSuccessful) {
+//                        var downloadUrl = task.result.d
+//
+//                        var uploadTask: UploadTask = thumbFilePath.putBytes(thumbByteArray)
+//
+//                        uploadTask.addOnCompleteListener{
+//                            secondTask ->
+//                            var thumbUrl = task.result.toString()
+//                            if (secondTask.isSuccessful) {
+//                                var updateObj = HashMap<String, Any>()
+//                                updateObj["image"] = downloadUrl
+//                                updateObj["thumb_image"] = thumbUrl
+//
+//                                mDatabase.updateChildren(updateObj)
+//                            }
+//                        }
 //                    }
 //                }
 
-                var filePath = mStorageRef!!.child("chat_profile_images").child("$userId.jpg")
-                filePath.putFile(resultUri)
+
+
+
 
             }
         }

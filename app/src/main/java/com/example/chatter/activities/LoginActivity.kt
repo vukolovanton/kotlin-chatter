@@ -1,4 +1,4 @@
-package com.example.chatter.activities.activities.activities
+package com.example.chatter.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

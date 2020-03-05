@@ -1,13 +1,10 @@
 package com.example.chatter.activities
 
-import com.example.chatter.activities.activities.activities.CreateAccountActivity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.chatter.R
-import com.example.chatter.activities.activities.activities.DashboardActivity
-import com.example.chatter.activities.activities.activities.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,6 +33,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Not sign in", Toast.LENGTH_LONG).show()
             }
         }
+
 
         createAccountButton.setOnClickListener{
             startActivity(Intent(this, CreateAccountActivity::class.java))

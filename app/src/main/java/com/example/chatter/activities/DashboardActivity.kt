@@ -1,16 +1,14 @@
-package com.example.chatter.activities.activities.activities
+package com.example.chatter.activities
 
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import com.example.chatter.R
-import com.example.chatter.activities.MainActivity
 import com.example.chatter.activities.adapters.SectionPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
