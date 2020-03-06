@@ -25,23 +25,22 @@ import kotlinx.android.synthetic.main.chat_to_row.view.*
     private var currentUserId: String? = null
     private lateinit var mFirebaseDatabaseRef: DatabaseReference
     private var mFirebaseUser: FirebaseUser? = null
-
     private var mLinearLayoutManager: LinearLayoutManager? = null
-
      private var toUser: String? = null
 
     val adapter = GroupAdapter<GroupieViewHolder>()
 
+     //Callback-функция, чтобы асинхронно получить юзера из бд и использовать его в основном классе
+     //Лучше было использовать companion object, но пока так
     interface MyCallback {
         fun onCallback(value: String)
     }
-    fun readData(myCallback: MyCallback) {
+    private fun readData(myCallback: MyCallback) {
         mFirebaseDatabaseRef = FirebaseDatabase.getInstance().reference.child("users").child(currentUserId!!)
         mFirebaseDatabaseRef
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val image = dataSnapshot.child("image").value.toString()
-                    Log.d("TEST2", "Inside $myImg")
                     myCallback.onCallback(image)
                 }
                 override fun onCancelled(databaseError: DatabaseError) {}
@@ -53,80 +52,88 @@ import kotlinx.android.synthetic.main.chat_to_row.view.*
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+
         mFirebaseUser = FirebaseAuth.getInstance().currentUser
         currentUserId = mFirebaseUser!!.uid
         userId = intent.extras?.getString("userId")
         userImg = intent.extras?.getString("profile")
-        toUser = userId
-//        Log.d("USERS", "USERS $toUser" )
-//        Log.d("USERS", "USERSWWW $currentUserId" )
-
-
+//        toUser = userId
         mLinearLayoutManager = LinearLayoutManager(this)
         mLinearLayoutManager!!.stackFromEnd = true
-
+        //Получаем картинку текущего юзера из колбека
         readData(object : MyCallback {
             override fun onCallback(value: String) {
                 val myImg = value
-                Log.d("TEST2", "FUCKING $myImg")
+                //Фетчим список сообщений
                 listenForMessages(userImg!!, myImg)
             }
         })
-
+        //Устанавливаем наш основной адаптер recyclerView
         recyclerviewChatLog.adapter = adapter
 
         sendButton.setOnClickListener{
+                //Отправляем сообщение
                 preformSendMessage(userId)
         }
     }
+     //Сообщения
     private fun listenForMessages(userImg: String, myImg: String) {
+
         val fromId = FirebaseAuth.getInstance().uid
-        val toId = toUser
-//        Log.d("USERS", fromId)
-//        Log.d("USERS", toId)
+        val toId = userId
+        //Куда будем записывать сообщения
         val mReference = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
         mReference.addChildEventListener(object : ChildEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-            }
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-            }
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-            }
+            override fun onCancelled(p0: DatabaseError) {}
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-
+                //Помещаем дату с сервера в объект сообщения
                 val chatMessage = p0.getValue(ChatMessage::class.java)
                 if (chatMessage != null) {
+                    //Устанавливаем адаптер
                     //Если сообщение от нас
                     if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                         adapter.add(ChatFromItem(chatMessage.text!!, myImg))
+                        recyclerviewChatLog.scrollToPosition(adapter.itemCount - 1)
                         //Или не от нас, вставояем в разные адаптеры
                     } else {
                         adapter.add(ChatToItem(chatMessage.text!!, userImg))
                     }
                 }
             }
-            override fun onChildRemoved(p0: DataSnapshot) {
-            }
-
+            override fun onChildRemoved(p0: DataSnapshot) {}
         })
     }
-
+    //Обрабатываем отправку сообщений
     private fun preformSendMessage(intentToId: String?) {
         val text = messageEdit.text.toString()
         val fromId = FirebaseAuth.getInstance().uid
         val toId = intentToId
 
-//        val mReference = FirebaseDatabase.getInstance().getReference("/messages").push()
+        if (text.trim() == "") {
+            return
+        }
+        //Два пути, чтобы видеть отправленные и полученные сообщения
         val mReference = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
         val toReference = FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
-
+        //Собираем сообщение из конструктора класса
         val chatMessage = ChatMessage(mReference.key, text, fromId, toId, System.currentTimeMillis()/1000)
+        //Отправляем сообщение в бд
         mReference.setValue(chatMessage).addOnSuccessListener {
+            //Очищаем поле ввода и скроллим вниз
             messageEdit.text.clear()
             recyclerviewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
         toReference.setValue(chatMessage)
     }
+
+     override fun onSupportNavigateUp(): Boolean {
+         onBackPressed()
+         return true
+     }
 
 }
 
@@ -135,25 +142,17 @@ class ChatFromItem(val text: String, private val myAvatar: String): Item<Groupie
         return R.layout.chat_from_row
     }
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-
         viewHolder.itemView.chatFromText.text = text
         Picasso.get().load(myAvatar).into(viewHolder.itemView.chatFromImage)
     }
 }
 
-
-
-
 class ChatToItem(val text: String, private val toAvatar: String): Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_to_row
     }
-
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-
         viewHolder.itemView.chatToText.text = text
         Picasso.get().load(toAvatar).into(viewHolder.itemView.chatToImage)
     }
 }
-
-

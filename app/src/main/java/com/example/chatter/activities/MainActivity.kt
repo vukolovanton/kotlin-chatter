@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     var mAuthListener: FirebaseAuth.AuthStateListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -29,8 +30,6 @@ class MainActivity : AppCompatActivity() {
                 //Сразу в дашборд
                 startActivity(Intent(this, DashboardActivity::class.java))
                 finish()
-            } else {
-                Toast.makeText(this, "Not sign in", Toast.LENGTH_LONG).show()
             }
         }
 

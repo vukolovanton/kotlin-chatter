@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.example.chatter.R
 import com.google.firebase.auth.FirebaseAuth
@@ -17,12 +19,14 @@ class CreateAccountActivity : AppCompatActivity() {
     //Переменные для аутентификации и бд
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mDatabase: DatabaseReference
+    private var pb: ProgressBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_account)
 
         mAuth = FirebaseAuth.getInstance()
+        pb = findViewById(R.id.createProgressBar)
 
         //Прослушиваем клик на кнопку в активности лоигна
         accountCreateAccountButton.setOnClickListener {
@@ -41,6 +45,7 @@ class CreateAccountActivity : AppCompatActivity() {
     }
 
     private fun createAccount(email: String, password: String, displayName: String) {
+        pb?.visibility = View.VISIBLE
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this){
                 task ->
             if (task.isSuccessful) {

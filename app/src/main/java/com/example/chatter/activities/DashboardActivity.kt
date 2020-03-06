@@ -26,28 +26,22 @@ class DashboardActivity : AppCompatActivity() {
         var viewPager: ViewPager? = null
         tabLayout = findViewById(R.id.dashTabLayout)
         viewPager = findViewById(R.id.dashViewPagerId)
-        tabLayout.addTab(tabLayout.newTab().setText("User"))
-        tabLayout.addTab(tabLayout.newTab().setText("Chats"))
+        tabLayout.addTab(tabLayout.newTab().setText("All Users"))
+        tabLayout.addTab(tabLayout.newTab().setText("Nothing"))
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
-        tabLayout.setTabTextColors(Color.BLACK, Color.WHITE)
+        tabLayout.setTabTextColors(Color.DKGRAY, Color.WHITE)
         val adapter = SectionPagerAdapter(this, supportFragmentManager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab) {
-                //
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                //
-            }
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewPager.currentItem = tab.position
             }
         })
-
         if (intent.extras != null) {
             var username = intent.extras!!.get("name")
-            Toast.makeText(this, "Logged in!", Toast.LENGTH_LONG).show()
         }
 
     }

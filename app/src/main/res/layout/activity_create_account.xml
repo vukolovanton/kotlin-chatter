@@ -2,77 +2,95 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="activities.CreateAccountActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_height="400dp"
         android:background="#FFFFFF"
-        app:cardCornerRadius="25dp"
+        app:cardCornerRadius="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="24dp">
 
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                app:srcCompat="@drawable/chat_icon" />
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                app:srcCompat="@drawable/signin" />
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
                 android:text="Create a New Account"
+                android:textAlignment="viewStart"
                 android:textColor="@color/darkBg"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/accountDisplayNameE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/selector_bg_edit_2"
                 android:ems="10"
                 android:hint="Name"
-                android:background="@drawable/selector_bg_edit_2"
-                android:textCursorDrawable="@drawable/bg_input_cursor_2"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textCursorDrawable="@drawable/bg_input_cursor_2" />
 
             <EditText
                 android:id="@+id/accountEmailE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/selector_bg_edit_2"
                 android:ems="10"
                 android:hint="@string/enter_email"
-                android:background="@drawable/selector_bg_edit_2"
-                android:textCursorDrawable="@drawable/bg_input_cursor_2"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:textCursorDrawable="@drawable/bg_input_cursor_2" />
 
             <EditText
                 android:id="@+id/accountPasswordE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/selector_bg_edit_2"
                 android:ems="10"
                 android:hint="@string/enter_password"
-                android:background="@drawable/selector_bg_edit_2"
-                android:textCursorDrawable="@drawable/bg_input_cursor_2"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:textCursorDrawable="@drawable/bg_input_cursor_2" />
+
+            <ProgressBar
+                android:id="@+id/createProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:visibility="invisible" />
 
             <Button
                 android:id="@+id/accountCreateAccountButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bt_shape"
+                android:background="@color/colorAccent"
                 android:stateListAnimator="@drawable/state_list_animator_z"
-                android:text="Button" />
+                android:text="create"
+                android:textColor="@color/darkBg" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

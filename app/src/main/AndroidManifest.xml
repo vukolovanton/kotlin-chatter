@@ -20,9 +20,9 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.DashboardActivity" />
-        <activity android:name=".activities.CreateAccountActivity" />
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.CreateAccountActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activities.LoginActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activities.MainActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

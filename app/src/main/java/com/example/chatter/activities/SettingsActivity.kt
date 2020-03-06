@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chatter.R
 import com.example.chatter.activities.models.Users
@@ -28,6 +29,9 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         title = "Settings";
+
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         mCurrentUser = FirebaseAuth.getInstance().currentUser
         mStorageRef = FirebaseStorage.getInstance().reference
@@ -69,6 +73,13 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        val dashboardIntent = Intent(this, DashboardActivity::class.java)
+        startActivity(dashboardIntent)
+        finish()
+        return true
+    }
+
     //Если слазели в галерею удачно
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -88,7 +99,6 @@ class SettingsActivity : AppCompatActivity() {
                 //Записываем uri кропнутой картинки
                 val resultUri = result.uri
                 val userId = mCurrentUser!!.uid
-//                var thumbFile = File(resultUri.path)
                 //По id находим в бд юзера, который полез менять картинку
                 val filePath = mStorageRef.child("chat_profile_images").child("$userId.jpg")
                 filePath.putFile(resultUri).addOnSuccessListener {

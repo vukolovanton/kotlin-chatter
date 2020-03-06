@@ -20,6 +20,7 @@ import com.example.chatter.ProfileActivity
 import com.example.chatter.R
 import com.example.chatter.activities.models.Users
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.firestore.auth.User
 import com.squareup.picasso.Picasso
@@ -33,6 +34,8 @@ import kotlinx.android.synthetic.main.users_row.view.*
  */
 class UserFragment : Fragment() {
     var mUserDatabase: DatabaseReference? = null
+    private var mCurrentUser: FirebaseUser? = null
+    var tempId: String? = null
       lateinit var mAuth: FirebaseAuth
 
     override fun onCreateView(
@@ -40,25 +43,23 @@ class UserFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_user, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-
         super.onViewCreated(view, savedInstanceState)
         //Фетчим юзеров
-        fetchUsers()
+
+        mCurrentUser = FirebaseAuth.getInstance().currentUser
+        tempId = mCurrentUser?.uid.toString()
+        fetchUsers(tempId!!)
     }
 
-    private fun fetchUsers() {
+    private fun fetchUsers(probablyMyid: String) {
         mAuth = FirebaseAuth.getInstance()
-
-
         mUserDatabase = FirebaseDatabase.getInstance().reference.child("users")
         mUserDatabase!!.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-            }
+            override fun onCancelled(p0: DatabaseError) {}
 
             override fun onDataChange(p0: DataSnapshot) {
 
@@ -71,24 +72,28 @@ class UserFragment : Fragment() {
                     val userId = it.key
                     //Отправляем класс в адаптер
                     if (user != null) {
-                        adapter.add(UserItem(user, context!!, userId.toString()))
+                        adapter.add(UserItem(user, context!!, userId.toString(), probablyMyid))
                     }
+
                 }
                 var linearLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 friendRecyclerViewId.setHasFixedSize(true)
                 friendRecyclerViewId.adapter = adapter
                 friendRecyclerViewId.layoutManager = linearLayoutManager
             }
-
         })
     }
 
-    class UserItem(private val users: Users, val context: Context, private var myId: String): Item<GroupieViewHolder>() {
+    class UserItem(private val users: Users, val context: Context, private var myId: String, private var someId: String): Item<GroupieViewHolder>() {
 
         override fun bind(groupieViewHolder: GroupieViewHolder, position: Int) {
             groupieViewHolder.itemView.userName.text = users.display_name
             groupieViewHolder.itemView.userStatus.text = users.status
             users.userId = myId
+
+            if (users.userId == someId){
+                groupieViewHolder.itemView.itsMe.text = "It's me!"
+            }
 
             Picasso.get().load(users.image).placeholder(R.drawable.profile_img).into(groupieViewHolder.itemView.usersProfileImg)
             groupieViewHolder.itemView.setOnClickListener {
