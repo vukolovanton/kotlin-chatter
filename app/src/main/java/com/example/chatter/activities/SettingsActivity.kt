@@ -2,14 +2,11 @@ package com.example.chatter.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import com.example.chatter.R
+import com.example.chatter.activities.models.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -18,8 +15,6 @@ import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_settings.*
-import java.io.ByteArrayOutputStream
-import java.io.File
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -27,7 +22,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var mDatabase: DatabaseReference
     private var mCurrentUser: FirebaseUser? = null
     private lateinit var mStorageRef: StorageReference
-    var GALLERY_ID: Int = 1
+    private var GALLERY_ID: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,17 +40,16 @@ class SettingsActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                //Получаем данные из бд
-                var displayName = dataSnapshot.child("display_name").value
-                var image = dataSnapshot.child("image").value
-                var userStatus = dataSnapshot.child("status").value
-                var thumbnail = dataSnapshot.child("thumb_image").value
+                //Получаем референс из бд
+                val displayName = dataSnapshot.child("display_name").value
+                val image = dataSnapshot.child("image").value
+                val userStatus = dataSnapshot.child("status").value
                 //Устанавливаем текст в поля
                 settingsDisplayName.text = displayName.toString()
                 settingsStatustextId.text = userStatus.toString()
-
+                //Перезаписываем аватар пользователя
                 if (!image!!.equals("default")) {
-                    Picasso.get().load(image.toString()).into(settingsProfileImg)
+                    Picasso.get().load(image.toString()).into(usersProfileImg)
                 }
             }
         })
@@ -65,8 +59,9 @@ class SettingsActivity : AppCompatActivity() {
             intent.putExtra("status", settingsStatustextId.text.toString().trim())
             startActivity(intent)
         }
-
+        //Прослушиваем клик на кнопку "загрузить картинку"
         settingsChangeImageButtonId.setOnClickListener {
+            //Интент лезет в галерею и сохраняет uri картинки
             val galleryIntent = Intent()
             galleryIntent.type = "image/*"
             galleryIntent.action = Intent.ACTION_GET_CONTENT
@@ -74,75 +69,40 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    //Если слазели в галерею удачно
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        //Ага, наш интент и всё ок
         if (requestCode == GALLERY_ID && resultCode == Activity.RESULT_OK) {
-            var image: Uri? = data!!.data
+            //Сохраняем uri
+            val image: Uri? = data!!.data
+            //Кропаем
             CropImage.activity(image).setAspectRatio(1, 1).start(this)
         }
 
-        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            //Кропнули удачно - записываем результат
             val result = CropImage.getActivityResult(data)
 
-            if (resultCode === Activity.RESULT_OK) {
-                //Оригинальный файл
+            if (resultCode == Activity.RESULT_OK) {
+                //Записываем uri кропнутой картинки
                 val resultUri = result.uri
-                var userId = mCurrentUser!!.uid
-                var thumbFile = File(resultUri.path)
-
-
-
-//                val bitmap =
-//                    MediaStore.Images.Media.getBitmap(this.contentResolver, resultUri)
-//                var byteArray = ByteArrayOutputStream()
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArray)
-//                var thumbByteArray: ByteArray
-//                thumbByteArray = byteArray.toByteArray()
-
-                var filePath = mStorageRef.child("chat_profile_images").child("$userId.jpg")
-                //Путь для маленьких картинок
-//                var thumbFilePath = mStorageRef!!.child("chat_profile_images").child("thumbs").child(userId + ".jpg")
-
-//                var uploadTask = thumbFilePath.putBytes(thumbByteArray)
-
-
+                val userId = mCurrentUser!!.uid
+//                var thumbFile = File(resultUri.path)
+                //По id находим в бд юзера, который полез менять картинку
+                val filePath = mStorageRef.child("chat_profile_images").child("$userId.jpg")
                 filePath.putFile(resultUri).addOnSuccessListener {
                     filePath.downloadUrl
                         .addOnSuccessListener { uri ->
-                            var updateObj = HashMap<String, Any>()
+                            //Создаем копию объекта пользователя и перезаписываем его в бд, но уже с новой картинкой
+                            val updateObj = HashMap<String, Any>()
                                 updateObj["image"] = uri.toString()
-//                                updateObj["thumb_image"] = thumbUrl
-
                                 mDatabase.updateChildren(updateObj)
                         }
                 }
-
-//                filePath.putFile(resultUri).addOnCompleteListener{
-//                    task ->
-//                    if (task.isSuccessful) {
-//                        var downloadUrl = task.result.d
-//
-//                        var uploadTask: UploadTask = thumbFilePath.putBytes(thumbByteArray)
-//
-//                        uploadTask.addOnCompleteListener{
-//                            secondTask ->
-//                            var thumbUrl = task.result.toString()
-//                            if (secondTask.isSuccessful) {
-//                                var updateObj = HashMap<String, Any>()
-//                                updateObj["image"] = downloadUrl
-//                                updateObj["thumb_image"] = thumbUrl
-//
-//                                mDatabase.updateChildren(updateObj)
-//                            }
-//                        }
-//                    }
-//                }
-
-
-
-
-
             }
         }
     }
+
+
 }
