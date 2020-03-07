@@ -96,12 +96,12 @@ import kotlinx.android.synthetic.main.chat_to_row.view.*
                     //Устанавливаем адаптер
                     //Если сообщение от нас
                     if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-                        adapter.add(ChatToItem(chatMessage.text!!, userImg))
+                        adapter.add(ChatToItem(chatMessage.text!!, myImg))
                         recyclerviewChatLog.scrollToPosition(adapter.itemCount - 1)
                         //Или не от нас, вставояем в разные адаптеры
                     } else {
 
-                        adapter.add(ChatFromItem(chatMessage.text!!, myImg))
+                        adapter.add(ChatFromItem(chatMessage.text!!, userImg))
                     }
                 }
             }
