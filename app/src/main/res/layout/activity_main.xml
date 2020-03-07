@@ -38,7 +38,7 @@
         android:layout_height="54dp"
         android:layout_marginTop="100dp"
         android:background="@color/colorAccent"
-        android:text="@string/common_signin_button_text"
+        android:text="SIGN IN"
         android:textColor="@color/darkBg"
         android:textSize="14sp"
         android:textStyle="bold"

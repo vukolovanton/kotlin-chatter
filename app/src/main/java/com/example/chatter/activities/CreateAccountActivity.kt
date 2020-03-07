@@ -45,10 +45,11 @@ class CreateAccountActivity : AppCompatActivity() {
     }
 
     private fun createAccount(email: String, password: String, displayName: String) {
-        pb?.visibility = View.VISIBLE
+
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this){
                 task ->
             if (task.isSuccessful) {
+                pb?.visibility = View.VISIBLE
                 //sign-in
                 var currentUser = mAuth.currentUser
                 var userId = currentUser!!.uid
@@ -77,6 +78,7 @@ class CreateAccountActivity : AppCompatActivity() {
 
             } else {
                 Log.w("AUTH", "createUserWithEmail:failure", task.exception)
+                Toast.makeText(this, task.exception?.message.toString(), Toast.LENGTH_LONG).show()
             }
 
         }

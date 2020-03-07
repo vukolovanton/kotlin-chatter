@@ -96,11 +96,12 @@ import kotlinx.android.synthetic.main.chat_to_row.view.*
                     //Устанавливаем адаптер
                     //Если сообщение от нас
                     if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-                        adapter.add(ChatFromItem(chatMessage.text!!, myImg))
+                        adapter.add(ChatToItem(chatMessage.text!!, userImg))
                         recyclerviewChatLog.scrollToPosition(adapter.itemCount - 1)
                         //Или не от нас, вставояем в разные адаптеры
                     } else {
-                        adapter.add(ChatToItem(chatMessage.text!!, userImg))
+
+                        adapter.add(ChatFromItem(chatMessage.text!!, myImg))
                     }
                 }
             }
@@ -143,7 +144,7 @@ class ChatFromItem(val text: String, private val myAvatar: String): Item<Groupie
     }
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.chatFromText.text = text
-        Picasso.get().load(myAvatar).into(viewHolder.itemView.chatFromImage)
+        Picasso.get().load(myAvatar).placeholder(R.drawable.profile_img).into(viewHolder.itemView.chatFromImage)
     }
 }
 
@@ -153,6 +154,6 @@ class ChatToItem(val text: String, private val toAvatar: String): Item<GroupieVi
     }
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.chatToText.text = text
-        Picasso.get().load(toAvatar).into(viewHolder.itemView.chatToImage)
+        Picasso.get().load(toAvatar).placeholder(R.drawable.profile_img).into(viewHolder.itemView.chatToImage)
     }
 }
